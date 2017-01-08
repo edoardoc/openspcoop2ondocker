@@ -1,8 +1,8 @@
 # Use latest jboss/base-jdk:8 image as the base
 FROM jboss/wildfly
-ADD OpenSPCoop2.ear /opt/jboss/wildfly/standalone/deployments/
-ADD openspcoop2-ds.xml /opt/jboss/wildfly/standalone/deployments/
-ADD openspcoop2_console-ds.xml /opt/jboss/wildfly/standalone/deployments/
+ADD dist/archivi/OpenSPCoop2.ear /opt/jboss/wildfly/standalone/deployments/
+ADD dist/datasource/openspcoop2-ds.xml /opt/jboss/wildfly/standalone/deployments/
+ADD dist/datasource/openspcoop2_console-ds.xml /opt/jboss/wildfly/standalone/deployments/
 ADD mysql-connector-java-5.1.40-bin.jar /opt/jboss/wildfly/standalone/deployments/
 
 # make sure openspcoop2 gets its own writable log folder

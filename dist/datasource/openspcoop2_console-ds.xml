@@ -4,7 +4,7 @@
 	<datasource jta="false" use-ccm="false" jndi-name="org.openspcoop2.dataSource.pddConsole" use-java-context="false" pool-name="org.openspcoop2.dataSource.pddConsole">
 
 		<!-- Connection URL -->
-		<connection-url>jdbc:mysql://dbmysql:3306/openspcoop2?zeroDateTimeBehavior=convertToNull</connection-url>
+		<connection-url>jdbc:mysql://openspcoop2dbhost:3306/openspcoop2?zeroDateTimeBehavior=convertToNull</connection-url>
 
 		<!-- DriverJDBC -->
 		<driver>mysql-connector-java-5.1.40-bin.jar</driver>

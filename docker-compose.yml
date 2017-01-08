@@ -1,11 +1,11 @@
 version: '2'
 services:
 
-  dbmysql:
-    image: mysql:5.5
+  dbospc2host:
+    image: mysql:5.6
     volumes:
         # this is to execute the create db on start
-        - ./ddl:/docker-entrypoint-initdb.d
+        - ./dist/sql:/docker-entrypoint-initdb.d
     #   eventually mount db folders on the host
     #    - ./data/mysql:/var/lib/mysql
     #    - ./docker/mysql.d:/etc/mysql/conf.d
@@ -24,4 +24,4 @@ services:
     ports:
         - 8080
     depends_on:
-        - dbmysql
+        - dbospc2host
