@@ -5,10 +5,10 @@ services:
     container_name: service
     build: .
     ports:
-        - 8080
+        - 8080:8080
+        - 9990:9990
     depends_on:
         - mydatabase
-    #command: ["/bin/bash", "-c", "sleep 30s"]
 
   mydatabase:
     container_name: database
