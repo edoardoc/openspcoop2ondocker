@@ -1,0 +1,81 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Installer Porta di Dominio OpenSPCoop2 v2.3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Il software OpenSPCoop2 e' distribuito con licenza GPL v3
+
+Per maggiori informazioni sul prodotto:
+
+	  http://www.openspcoop.org
+
+	  http://www.link.it
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Informazioni preliminari
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Directory di lavoro   [default:/var/openspcoop2]
+DBMS
+ view available options
+ 1) PostgreSQL [default]
+ 2) MySQL
+ 3) Oracle
+ 4) HyperSQL
+ 5) SQLServer
+ 6) IBM DB2
+ Enter a number
+1
+
+
+Application Server
+ view available options
+ 1) WildFly 10.x [default]
+ 2) WildFly 9.x
+ 3) WildFly 8.x
+ 4) JBoss 7.x
+ 5) Apache Tomcat 9.x
+ 6) Apache Tomcat 8.x
+ 7) Apache Tomcat 7.x
+ 8) Apache Tomcat 6.x
+ Enter a number
+1
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Configurazioni DBMS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Hostname   [default:127.0.0.1]
+Porta   [default:5432]
+Nome Database   [default:openspcoop2]
+Username   [default:openspcoop2]
+Password   [default:openspcoop2]
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Configurazione Utenza Amministrazione
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Username Amministratore   [default:amministratore]
+
+RACCOMANDAZIONI SULLA PASSWORD SONO INDICATE DI SEGUITO:
+- differente dall'username
+- contenga almeno 8 caratteri
+- contenga almeno un carattere alfabetico, un numero ed un simbolo non alfanumerico
+Password   [default:null]
+12345678abcde
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Cooperazione Applicativa
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PROTOCOLLI ATTIVI
+SPCoop   [default:true]
+Proxy Trasparente   [default:true]
+SdI (Fatturazione Elettronica)   [default:false]
+Soggetto della PdD   [default:]
+soggettopdd1
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Compatibilità interfacce OpenSPCoop-v1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Modulo OpenSPCoop-v1   [default:true]

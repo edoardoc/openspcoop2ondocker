@@ -2589,7 +2589,7 @@ INSERT INTO msgdiag_appender_prop (id_appender,nome,valore) VALUES ((select id f
 INSERT INTO msgdiag_appender_prop (id_appender,nome,valore) VALUES ((select id from msgdiag_appender where tipo='protocol'),'usePdDConnection','true');
 
 -- PdD
-UPDATE pdd set nome='PdDsoggettoPDD01';
+UPDATE pdd set nome='PdDsoggettopdd1';
 UPDATE pdd set superuser='amministratore';
 
 -- Configurazione Cache Registro
@@ -2614,25 +2614,25 @@ UPDATE configurazione set auth_lifecache='7200';
 -- Protocol spcoop
 
 INSERT INTO connettori (endpointtype,nome_connettore,debug,custom) VALUES 
-			('disabilitato','CNT_SPC_soggettoPDD01',0,0);
+			('disabilitato','CNT_SPC_soggettopdd1',0,0);
 INSERT INTO soggetti (nome_soggetto,tipo_soggetto,descrizione,identificativo_porta,is_router,id_connettore,superuser,server,privato,profilo,codice_ipa) VALUES
-	    ('soggettoPDD01','SPC',null,'soggettoPDD01SPCoopIT',0,
-	     (select id from connettori where nome_connettore='CNT_SPC_soggettoPDD01'),
-	     'amministratore','PdDsoggettoPDD01',0,'eGov1.1-lineeGuida1.1','o=soggettoPDD01,c=it');
+	    ('soggettopdd1','SPC',null,'soggettopdd1SPCoopIT',0,
+	     (select id from connettori where nome_connettore='CNT_SPC_soggettopdd1'),
+	     'amministratore','PdDsoggettopdd1',0,'eGov1.1-lineeGuida1.1','o=soggettopdd1,c=it');
 
 
 
 -- Protocol trasparente
 
 INSERT INTO connettori (endpointtype,nome_connettore,debug,custom) VALUES 
-			('disabilitato','CNT_PROXY_soggettoPDD01',0,0);
+			('disabilitato','CNT_PROXY_soggettopdd1',0,0);
 INSERT INTO soggetti (nome_soggetto,tipo_soggetto,descrizione,identificativo_porta,is_router,id_connettore,superuser,server,privato,profilo,codice_ipa) VALUES
-	    ('soggettoPDD01','PROXY',null,'soggettoPDD01PdD',0,
-	     (select id from connettori where nome_connettore='CNT_PROXY_soggettoPDD01'),
-	     'amministratore','PdDsoggettoPDD01',0,'1.0','o=PROXYsoggettoPDD01,c=it');
+	    ('soggettopdd1','PROXY',null,'soggettopdd1PdD',0,
+	     (select id from connettori where nome_connettore='CNT_PROXY_soggettopdd1'),
+	     'amministratore','PdDsoggettopdd1',0,'1.0','o=PROXYsoggettopdd1,c=it');
 
 
 
 -- Utenza pddConsole
 
-INSERT INTO users (login, password, tipo_interfaccia, permessi) VALUES ('amministratore','$1$xM$w6jXANHJ.HLQWDN1z5r9e/','STANDARD','SDCMAU');
+INSERT INTO users (login, password, tipo_interfaccia, permessi) VALUES ('amministratore','$1$oF$3XgUnO3nuJjORWyeyFTeD0','STANDARD','SDCMAU');
