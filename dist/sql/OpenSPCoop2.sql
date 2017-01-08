@@ -31,12 +31,10 @@ CREATE TABLE REPOSITORY_BUSTE
 	SEQUENZA INT,
 	INOLTRO_SENZA_DUPLICATI INT NOT NULL,
 	CONFERMA_RICEZIONE INT NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ORA_REGISTRAZIONE TIMESTAMP(3) DEFAULT 0,
+	ORA_REGISTRAZIONE TIMESTAMP,
 	TIPO_ORA_REGISTRAZIONE VARCHAR(255),
 	RIFERIMENTO_MESSAGGIO VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	SCADENZA_BUSTA TIMESTAMP(3) NOT NULL DEFAULT 0,
+	SCADENZA_BUSTA TIMESTAMP NOT NULL,
 	DUPLICATI INT NOT NULL,
 	-- Dati di integrazione
 	LOCATION_PD VARCHAR(255),
@@ -59,7 +57,7 @@ CREATE TABLE REPOSITORY_BUSTE
 	CONSTRAINT chk_REPOSITORY_BUSTE_1 CHECK (TIPO IN ('INBOX','OUTBOX')),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_REPOSITORY_BUSTE PRIMARY KEY (ID_MESSAGGIO,TIPO)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX REP_BUSTE_SEARCH ON REPOSITORY_BUSTE (SCADENZA_BUSTA,TIPO,HISTORY,PROFILO,PDD);
@@ -67,27 +65,30 @@ CREATE INDEX REP_BUSTE_SEARCH_RA ON REPOSITORY_BUSTE (SCADENZA_BUSTA,TIPO,REPOSI
 CREATE INDEX REP_BUSTE_SEARCH_TIPO ON REPOSITORY_BUSTE (TIPO,HISTORY,PROFILO,PDD);
 CREATE INDEX REP_BUSTE_SEARCH_TIPO_RA ON REPOSITORY_BUSTE (TIPO,REPOSITORY_ACCESS);
 
+CREATE SEQUENCE seq_LISTA_RISCONTRI start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
+
 CREATE TABLE LISTA_RISCONTRI
 (
 	ID_MESSAGGIO VARCHAR(255) NOT NULL,
 	TIPO VARCHAR(255) NOT NULL,
 	ID_RISCONTRO VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ORA_REGISTRAZIONE TIMESTAMP(3) DEFAULT 0,
+	ORA_REGISTRAZIONE TIMESTAMP,
 	TIPO_ORA_REGISTRAZIONE VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_LISTA_RISCONTRI') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_LISTA_RISCONTRI_1 CHECK (TIPO IN ('INBOX','OUTBOX')),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_LISTA_RISCONTRI_1 FOREIGN KEY (ID_MESSAGGIO,TIPO) REFERENCES REPOSITORY_BUSTE(ID_MESSAGGIO,TIPO) ON DELETE CASCADE,
 	CONSTRAINT pk_LISTA_RISCONTRI PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX LISTA_RISC_ID ON LISTA_RISCONTRI (ID_MESSAGGIO,TIPO);
 
 
+
+CREATE SEQUENCE seq_LISTA_TRASMISSIONI start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE LISTA_TRASMISSIONI
 (
@@ -97,22 +98,23 @@ CREATE TABLE LISTA_TRASMISSIONI
 	TIPO_ORIGINE VARCHAR(255),
 	DESTINAZIONE VARCHAR(255),
 	TIPO_DESTINAZIONE VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ORA_REGISTRAZIONE TIMESTAMP(3) DEFAULT 0,
+	ORA_REGISTRAZIONE TIMESTAMP,
 	TIPO_ORA_REGISTRAZIONE VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_LISTA_TRASMISSIONI') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_LISTA_TRASMISSIONI_1 CHECK (TIPO IN ('INBOX','OUTBOX')),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_LISTA_TRASMISSIONI_1 FOREIGN KEY (ID_MESSAGGIO,TIPO) REFERENCES REPOSITORY_BUSTE(ID_MESSAGGIO,TIPO) ON DELETE CASCADE,
 	CONSTRAINT pk_LISTA_TRASMISSIONI PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX LISTA_TRASM_ID ON LISTA_TRASMISSIONI (ID_MESSAGGIO,TIPO);
 
 
+
+CREATE SEQUENCE seq_LISTA_ECCEZIONI start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE LISTA_ECCEZIONI
 (
@@ -124,19 +126,21 @@ CREATE TABLE LISTA_ECCEZIONI
 	RILEVANZA VARCHAR(255),
 	POSIZIONE TEXT,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_LISTA_ECCEZIONI') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_LISTA_ECCEZIONI_1 CHECK (TIPO IN ('INBOX','OUTBOX')),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_LISTA_ECCEZIONI_1 FOREIGN KEY (ID_MESSAGGIO,TIPO) REFERENCES REPOSITORY_BUSTE(ID_MESSAGGIO,TIPO) ON DELETE CASCADE,
 	CONSTRAINT pk_LISTA_ECCEZIONI PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX LISTA_ECC_ID ON LISTA_ECCEZIONI (ID_MESSAGGIO,TIPO);
 CREATE INDEX LISTA_ECC_VALIDAZIONE ON LISTA_ECCEZIONI (ID_MESSAGGIO,TIPO,VALIDAZIONE);
 
 
+
+CREATE SEQUENCE seq_LISTA_EXT_PROTOCOL_INFO start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE LISTA_EXT_PROTOCOL_INFO
 (
@@ -145,13 +149,13 @@ CREATE TABLE LISTA_EXT_PROTOCOL_INFO
 	NOME VARCHAR(255) NOT NULL,
 	VALORE TEXT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_LISTA_EXT_PROTOCOL_INFO') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_LISTA_EXT_PROTOCOL_INFO_1 CHECK (TIPO IN ('INBOX','OUTBOX')),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_LISTA_EXT_PROTOCOL_INFO_1 FOREIGN KEY (ID_MESSAGGIO,TIPO) REFERENCES REPOSITORY_BUSTE(ID_MESSAGGIO,TIPO) ON DELETE CASCADE,
 	CONSTRAINT pk_LISTA_EXT_PROTOCOL_INFO PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX LISTA_EXT_ID ON LISTA_EXT_PROTOCOL_INFO (ID_MESSAGGIO,TIPO);
@@ -163,12 +167,11 @@ CREATE INDEX LISTA_EXT_ID ON LISTA_EXT_PROTOCOL_INFO (ID_MESSAGGIO,TIPO);
 CREATE TABLE RISCONTRI_DA_RICEVERE
 (
 	ID_MESSAGGIO VARCHAR(255) NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	DATA_INVIO TIMESTAMP(3) NOT NULL DEFAULT 0,
+	DATA_INVIO TIMESTAMP NOT NULL,
 	-- fk/pk columns
 	-- fk/pk keys constraints
 	CONSTRAINT pk_RISCONTRI_DA_RICEVERE PRIMARY KEY (ID_MESSAGGIO)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX RISCONTRI_NON_RICEVUTI ON RISCONTRI_DA_RICEVERE (DATA_INVIO);
@@ -189,7 +192,7 @@ CREATE TABLE SEQUENZA_DA_INVIARE
 	-- fk/pk columns
 	-- fk/pk keys constraints
 	CONSTRAINT pk_SEQUENZA_DA_INVIARE PRIMARY KEY (MITTENTE,TIPO_MITTENTE,DESTINATARIO,TIPO_DESTINATARIO,SERVIZIO,TIPO_SERVIZIO,AZIONE)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 CREATE TABLE SEQUENZA_DA_RICEVERE
@@ -207,7 +210,7 @@ CREATE TABLE SEQUENZA_DA_RICEVERE
 	-- fk/pk columns
 	-- fk/pk keys constraints
 	CONSTRAINT pk_SEQUENZA_DA_RICEVERE PRIMARY KEY (ID_COLLABORAZIONE)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 -- **** Asincroni ****
@@ -216,8 +219,7 @@ CREATE TABLE ASINCRONO
 (
 	ID_MESSAGGIO VARCHAR(255) NOT NULL,
 	TIPO VARCHAR(255) NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ORA_REGISTRAZIONE TIMESTAMP(3) NOT NULL DEFAULT 0,
+	ORA_REGISTRAZIONE TIMESTAMP NOT NULL,
 	RICEVUTA_ASINCRONA INT NOT NULL,
 	TIPO_SERVIZIO_CORRELATO VARCHAR(255),
 	SERVIZIO_CORRELATO VARCHAR(255),
@@ -234,7 +236,7 @@ CREATE TABLE ASINCRONO
 	CONSTRAINT chk_ASINCRONO_1 CHECK (TIPO IN ('INBOX','OUTBOX')),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_ASINCRONO PRIMARY KEY (ID_MESSAGGIO,TIPO)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX ASINCRONO_BACKUP_ID ON ASINCRONO (BACKUP_ID_RICHIESTA);
@@ -250,12 +252,11 @@ CREATE TABLE ID_MESSAGGIO
 (
 	COUNTER BIGINT NOT NULL,
 	PROTOCOLLO VARCHAR(255) NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
 	-- fk/pk keys constraints
 	CONSTRAINT pk_ID_MESSAGGIO PRIMARY KEY (PROTOCOLLO)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 CREATE TABLE ID_MESSAGGIO_RELATIVO
@@ -263,24 +264,22 @@ CREATE TABLE ID_MESSAGGIO_RELATIVO
 	COUNTER BIGINT NOT NULL,
 	PROTOCOLLO VARCHAR(255) NOT NULL,
 	INFO_ASSOCIATA VARCHAR(255) NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
 	-- fk/pk keys constraints
 	CONSTRAINT pk_ID_MESSAGGIO_RELATIVO PRIMARY KEY (PROTOCOLLO,INFO_ASSOCIATA)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 CREATE TABLE ID_MESSAGGIO_PRG
 (
 	PROGRESSIVO VARCHAR(255) NOT NULL,
 	PROTOCOLLO VARCHAR(255) NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
 	-- fk/pk keys constraints
 	CONSTRAINT pk_ID_MESSAGGIO_PRG PRIMARY KEY (PROTOCOLLO)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 CREATE TABLE ID_MESSAGGIO_RELATIVO_PRG
@@ -288,12 +287,11 @@ CREATE TABLE ID_MESSAGGIO_RELATIVO_PRG
 	PROGRESSIVO VARCHAR(255) NOT NULL,
 	PROTOCOLLO VARCHAR(255) NOT NULL,
 	INFO_ASSOCIATA VARCHAR(255) NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
 	-- fk/pk keys constraints
 	CONSTRAINT pk_ID_MESSAGGIO_RELATIVO_PRG PRIMARY KEY (PROTOCOLLO,INFO_ASSOCIATA)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
@@ -306,12 +304,10 @@ CREATE TABLE MESSAGGI
 	ID_MESSAGGIO VARCHAR(255) NOT NULL,
 	TIPO VARCHAR(255) NOT NULL,
 	RIFERIMENTO_MSG VARCHAR(255),
-	ERRORE_PROCESSAMENTO MEDIUMTEXT,
+	ERRORE_PROCESSAMENTO TEXT,
 	-- data dalla quale il msg puo' essere rispedito in caso di errori
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	RISPEDIZIONE TIMESTAMP(3) NOT NULL DEFAULT 0,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ORA_REGISTRAZIONE TIMESTAMP(3) NOT NULL DEFAULT 0,
+	RISPEDIZIONE TIMESTAMP NOT NULL,
+	ORA_REGISTRAZIONE TIMESTAMP NOT NULL,
 	PROPRIETARIO VARCHAR(255),
 	-- le colonne seguenti servono per il servizio di TransactionManager
 	MOD_RICEZ_CONT_APPLICATIVI VARCHAR(255),
@@ -325,17 +321,15 @@ CREATE TABLE MESSAGGI
 	-- Thread Pool:impedisce la gestione di messaggi gia schedulati
 	SCHEDULING INT DEFAULT 0,
 	-- permette la riconsegna del messaggio dopo tot tempo
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	REDELIVERY_DELAY TIMESTAMP(3) NOT NULL DEFAULT 0,
+	REDELIVERY_DELAY TIMESTAMP NOT NULL,
 	-- numero di riconsegne effettuate
 	REDELIVERY_COUNT INT DEFAULT 0,
 	-- id del nodo del cluster che deve gestire questo messaggio.
 	CLUSTER_ID VARCHAR(255),
 	-- memorizza l'ora in cui il messaggio e stato schedulato la prima volta
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	SCHEDULING_TIME TIMESTAMP(3) DEFAULT 0,
+	SCHEDULING_TIME TIMESTAMP,
 	-- contiene un messaggio serializzato
-	MSG_BYTES MEDIUMBLOB,
+	MSG_BYTES BYTEA,
 	CORRELAZIONE_APPLICATIVA VARCHAR(255),
 	CORRELAZIONE_RISPOSTA VARCHAR(255),
 	PROTOCOLLO VARCHAR(255) NOT NULL,
@@ -344,7 +338,7 @@ CREATE TABLE MESSAGGI
 	CONSTRAINT chk_MESSAGGI_1 CHECK (TIPO IN ('INBOX','OUTBOX')),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_MESSAGGI PRIMARY KEY (ID_MESSAGGIO,TIPO)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX MESSAGGI_SEARCH ON MESSAGGI (ORA_REGISTRAZIONE,RIFERIMENTO_MSG,TIPO,PROPRIETARIO);
@@ -366,8 +360,7 @@ CREATE TABLE MSG_SERVIZI_APPLICATIVI
 	TIPO_CONSEGNA VARCHAR(255) NOT NULL,
 	ERRORE_PROCESSAMENTO TEXT,
 	-- data dalla quale il msg puo' essere rispedito in caso di errori
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	RISPEDIZIONE TIMESTAMP(3) NOT NULL DEFAULT 0,
+	RISPEDIZIONE TIMESTAMP NOT NULL,
 	NOME_PORTA VARCHAR(255),
 	-- fk/pk columns
 	-- check constraints
@@ -376,7 +369,7 @@ CREATE TABLE MSG_SERVIZI_APPLICATIVI
 	-- fk/pk keys constraints
 	CONSTRAINT fk_MSG_SERVIZI_APPLICATIVI_1 FOREIGN KEY (ID_MESSAGGIO,TIPO) REFERENCES MESSAGGI(ID_MESSAGGIO,TIPO) ON DELETE CASCADE,
 	CONSTRAINT pk_MSG_SERVIZI_APPLICATIVI PRIMARY KEY (ID_MESSAGGIO,SERVIZIO_APPLICATIVO)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX MSG_SERV_APPL_LIST ON MSG_SERVIZI_APPLICATIVI (SERVIZIO_APPLICATIVO,INTEGRATION_MANAGER);
@@ -389,17 +382,19 @@ CREATE TABLE DEFINIZIONE_MESSAGGI
 	SOAP_ACTION VARCHAR(255),
 	CONTENT_TYPE VARCHAR(255) NOT NULL,
 	CONTENT_LOCATION VARCHAR(255),
-	MSG_BYTES MEDIUMBLOB,
+	MSG_BYTES BYTEA,
 	-- fk/pk columns
 	-- check constraints
 	CONSTRAINT chk_DEFINIZIONE_MESSAGGI_1 CHECK (TIPO IN ('INBOX','OUTBOX')),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_DEFINIZIONE_MESSAGGI_1 FOREIGN KEY (ID_MESSAGGIO,TIPO) REFERENCES MESSAGGI(ID_MESSAGGIO,TIPO) ON DELETE CASCADE,
 	CONSTRAINT pk_DEFINIZIONE_MESSAGGI PRIMARY KEY (ID_MESSAGGIO,TIPO)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 -- **** Correlazione Applicativa ****
+
+CREATE SEQUENCE seq_CORRELAZIONE_APPLICATIVA start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE CORRELAZIONE_APPLICATIVA
 (
@@ -413,15 +408,13 @@ CREATE TABLE CORRELAZIONE_APPLICATIVA
 	TIPO_SERVIZIO VARCHAR(255),
 	SERVIZIO VARCHAR(255),
 	AZIONE VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	SCADENZA TIMESTAMP(3) DEFAULT 0,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+	SCADENZA TIMESTAMP,
+	ora_registrazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_CORRELAZIONE_APPLICATIVA') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_CORRELAZIONE_APPLICATIVA PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX CORR_APPL_SCADUTE ON CORRELAZIONE_APPLICATIVA (SCADENZA);
@@ -432,16 +425,18 @@ CREATE INDEX CORR_APPL_OLD ON CORRELAZIONE_APPLICATIVA (ora_registrazione);
 
 -- openspcoop2
 		  		
+CREATE SEQUENCE seq_db_info start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE db_info
 (
 	major_version INT NOT NULL,
 	minor_version INT NOT NULL,
 	notes VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_db_info') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_db_info PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
@@ -454,6 +449,8 @@ CREATE TABLE db_info
 INSERT INTO db_info (major_version,minor_version,notes) VALUES (2,3,'[OpenSPCoop_tags_2.3_ant_setup Revision N.12244, LastChangedRevision N.12244, 10/04/2016 01:37 PM] Database della Porta di Dominio OpenSPCoop2');
 
 -- **** Porte di Dominio ****
+
+CREATE SEQUENCE seq_pdd start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pdd
 (
@@ -478,21 +475,18 @@ CREATE TABLE pdd
 	password VARCHAR(255),
 	-- client auth: disabilitato/abilitato
 	client_auth VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	superuser VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pdd') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_pdd_1 CHECK (tipo IN ('operativo','nonoperativo','esterno')),
 	-- unique constraints
 	CONSTRAINT unique_pdd_1 UNIQUE (nome),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_pdd PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
--- index
-CREATE INDEX index_pdd_1 ON pdd (nome);
 
 
 
@@ -500,6 +494,8 @@ CREATE INDEX index_pdd_1 ON pdd (nome);
 -- openspcoop2
 		  		
 -- **** Connettori ****
+
+CREATE SEQUENCE seq_connettori start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE connettori
 (
@@ -531,17 +527,17 @@ CREATE TABLE connettori
 	-- 1/0 (true/false) indica se il connettore e' gestito tramite le proprieta' custom
 	custom INT DEFAULT 0,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_connettori') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_connettori_1 UNIQUE (nome_connettore),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_connettori PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_connettori_1 ON connettori (nome_connettore);
+);
 
 
+
+
+CREATE SEQUENCE seq_connettori_custom start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE connettori_custom
 (
@@ -549,16 +545,18 @@ CREATE TABLE connettori_custom
 	value VARCHAR(255) NOT NULL,
 	id_connettore BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_connettori_custom') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_connettori_custom_1 UNIQUE (id_connettore,name,value),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_connettori_custom_1 FOREIGN KEY (id_connettore) REFERENCES connettori(id),
 	CONSTRAINT pk_connettori_custom PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_connettori_properties start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE connettori_properties
 (
@@ -567,15 +565,13 @@ CREATE TABLE connettori_properties
 	-- location del file properties
 	path VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_connettori_properties') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_connettori_properties_1 UNIQUE (nome_connettore),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_connettori_properties PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
--- index
-CREATE INDEX index_connettori_properties_1 ON connettori_properties (nome_connettore);
 
 
 
@@ -584,6 +580,8 @@ CREATE INDEX index_connettori_properties_1 ON connettori_properties (nome_connet
 		  		
 -- **** Connettori Gestione Errore ****
 
+CREATE SEQUENCE seq_gestione_errore start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE gestione_errore
 (
 	-- accetta/rispedisci
@@ -591,15 +589,17 @@ CREATE TABLE gestione_errore
 	cadenza_rispedizione VARCHAR(255),
 	nome VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_gestione_errore') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_gestione_errore_1 UNIQUE (nome),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_gestione_errore PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_gestione_errore_trasporto start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE gestione_errore_trasporto
 (
@@ -610,14 +610,16 @@ CREATE TABLE gestione_errore_trasporto
 	comportamento VARCHAR(255),
 	cadenza_rispedizione VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_gestione_errore_trasporto') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_gestione_errore_trasporto_1 FOREIGN KEY (id_gestione_errore) REFERENCES gestione_errore(id),
 	CONSTRAINT pk_gestione_errore_trasporto PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_gestione_errore_soap start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE gestione_errore_soap
 (
@@ -629,11 +631,11 @@ CREATE TABLE gestione_errore_soap
 	comportamento VARCHAR(255),
 	cadenza_rispedizione VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_gestione_errore_soap') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_gestione_errore_soap_1 FOREIGN KEY (id_gestione_errore) REFERENCES gestione_errore(id),
 	CONSTRAINT pk_gestione_errore_soap PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
@@ -642,6 +644,8 @@ CREATE TABLE gestione_errore_soap
 -- openspcoop2
 		  		
 -- **** Soggetti ****
+
+CREATE SEQUENCE seq_soggetti start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE soggetti
 (
@@ -656,25 +660,21 @@ CREATE TABLE soggetti
 	server VARCHAR(255),
 	-- 1/0 (true/false) indica se il soggetto e' privato/pubblico
 	privato INT DEFAULT 0,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	profilo VARCHAR(255),
 	codice_ipa VARCHAR(255) NOT NULL,
 	pd_url_prefix_rewriter VARCHAR(255),
 	pa_url_prefix_rewriter VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_soggetti') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_soggetti_1 UNIQUE (nome_soggetto,tipo_soggetto),
 	CONSTRAINT unique_soggetti_2 UNIQUE (codice_ipa),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_soggetti_1 FOREIGN KEY (id_connettore) REFERENCES connettori(id),
 	CONSTRAINT pk_soggetti PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
--- index
-CREATE INDEX index_soggetti_1 ON soggetti (nome_soggetto,tipo_soggetto);
-CREATE INDEX index_soggetti_2 ON soggetti (codice_ipa);
 
 
 
@@ -682,6 +682,8 @@ CREATE INDEX index_soggetti_2 ON soggetti (codice_ipa);
 -- openspcoop2
 		  		
 -- **** Documenti ****
+
+CREATE SEQUENCE seq_documenti start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE documenti
 (
@@ -691,15 +693,14 @@ CREATE TABLE documenti
 	-- nome documento
 	nome VARCHAR(255) NOT NULL,
 	-- contenuto documento
-	contenuto MEDIUMBLOB NOT NULL,
+	contenuto BYTEA NOT NULL,
 	-- idOggettoProprietarioDocumento
 	id_proprietario BIGINT NOT NULL,
 	-- tipoProprietario
 	tipo_proprietario VARCHAR(255) NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_documenti') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_documenti_1 CHECK (ruolo IN ('allegato','specificaSemiformale','specificaLivelloServizio','specificaSicurezza','specificaCoordinamento')),
 	CONSTRAINT chk_documenti_2 CHECK (tipo_proprietario IN ('accordoServizio','accordoCooperazione','servizio')),
@@ -707,28 +708,29 @@ CREATE TABLE documenti
 	CONSTRAINT unique_documenti_1 UNIQUE (ruolo,tipo,nome,id_proprietario,tipo_proprietario),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_documenti PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
-CREATE INDEX index_documenti_1 ON documenti (ruolo,tipo,nome,id_proprietario,tipo_proprietario);
 CREATE INDEX INDEX_DOC_SEARCH ON documenti (id_proprietario);
 
 
 
 -- **** Accordi di Servizio Parte Comune ****
 
+CREATE SEQUENCE seq_accordi start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE accordi
 (
 	nome VARCHAR(255) NOT NULL,
 	descrizione VARCHAR(255),
 	profilo_collaborazione VARCHAR(255),
-	wsdl_definitorio MEDIUMTEXT,
-	wsdl_concettuale MEDIUMTEXT,
-	wsdl_logico_erogatore MEDIUMTEXT,
-	wsdl_logico_fruitore MEDIUMTEXT,
-	spec_conv_concettuale MEDIUMTEXT,
-	spec_conv_erogatore MEDIUMTEXT,
-	spec_conv_fruitore MEDIUMTEXT,
+	wsdl_definitorio TEXT,
+	wsdl_concettuale TEXT,
+	wsdl_logico_erogatore TEXT,
+	wsdl_logico_fruitore TEXT,
+	spec_conv_concettuale TEXT,
+	spec_conv_erogatore TEXT,
+	spec_conv_fruitore TEXT,
 	filtro_duplicati VARCHAR(255),
 	conferma_ricezione VARCHAR(255),
 	identificativo_collaborazione VARCHAR(255),
@@ -742,23 +744,22 @@ CREATE TABLE accordi
 	utilizzo_senza_azione INT DEFAULT 1,
 	-- 1/0 (true/false) indica se il soggetto e' privato/pubblico
 	privato INT DEFAULT 0,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	stato VARCHAR(255) NOT NULL DEFAULT 'finale',
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_accordi') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_accordi_1 CHECK (stato IN ('finale','bozza','operativo')),
 	-- unique constraints
 	CONSTRAINT unique_accordi_1 UNIQUE (nome,id_referente,versione),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_accordi PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_accordi_1 ON accordi (nome,id_referente,versione);
+);
 
 
+
+
+CREATE SEQUENCE seq_accordi_azioni start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE accordi_azioni
 (
@@ -774,18 +775,18 @@ CREATE TABLE accordi_azioni
 	-- ridefinito/default
 	profilo_azione VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_accordi_azioni') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_accordi_azioni_1 UNIQUE (id_accordo,nome),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_accordi_azioni_1 FOREIGN KEY (id_accordo) REFERENCES accordi(id),
 	CONSTRAINT pk_accordi_azioni PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_accordi_azioni_1 ON accordi_azioni (id_accordo,nome);
+);
 
 
+
+
+CREATE SEQUENCE seq_port_type start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE port_type
 (
@@ -803,18 +804,18 @@ CREATE TABLE port_type
 	-- document/RPC
 	soap_style VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_port_type') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_port_type_1 UNIQUE (id_accordo,nome),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_port_type_1 FOREIGN KEY (id_accordo) REFERENCES accordi(id),
 	CONSTRAINT pk_port_type PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_port_type_1 ON port_type (id_accordo,nome);
+);
 
 
+
+
+CREATE SEQUENCE seq_port_type_azioni start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE port_type_azioni
 (
@@ -842,18 +843,18 @@ CREATE TABLE port_type_azioni
 	-- namespace utilizzato per RPC
 	soap_namespace_msg_output VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_port_type_azioni') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_port_type_azioni_1 UNIQUE (id_port_type,nome),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_port_type_azioni_1 FOREIGN KEY (id_port_type) REFERENCES port_type(id),
 	CONSTRAINT pk_port_type_azioni PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_port_type_azioni_1 ON port_type_azioni (id_port_type,nome);
+);
 
 
+
+
+CREATE SEQUENCE seq_operation_messages start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE operation_messages
 (
@@ -866,11 +867,11 @@ CREATE TABLE operation_messages
 	type_name VARCHAR(255),
 	type_namespace VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_operation_messages') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_operation_messages_1 FOREIGN KEY (id_port_type_azione) REFERENCES port_type_azioni(id),
 	CONSTRAINT pk_operation_messages PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_OP_MESSAGES ON operation_messages (id_port_type_azione,input_message);
@@ -878,6 +879,8 @@ CREATE INDEX INDEX_OP_MESSAGES ON operation_messages (id_port_type_azione,input_
 
 
 -- **** Accordi di Cooperazione ****
+
+CREATE SEQUENCE seq_accordi_cooperazione start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE accordi_cooperazione
 (
@@ -890,36 +893,35 @@ CREATE TABLE accordi_cooperazione
 	-- 1/0 (true/false) indica se il soggetto e' privato/pubblico
 	privato INT DEFAULT 0,
 	superuser VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_accordi_cooperazione') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_accordi_cooperazione_1 CHECK (stato IN ('finale','bozza','operativo')),
 	-- unique constraints
 	CONSTRAINT unique_accordi_cooperazione_1 UNIQUE (nome,versione),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_accordi_cooperazione PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_accordi_cooperazione_1 ON accordi_cooperazione (nome,versione);
+);
 
 
+
+
+CREATE SEQUENCE seq_accordi_coop_partecipanti start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE accordi_coop_partecipanti
 (
 	id_accordo_cooperazione BIGINT NOT NULL,
 	id_soggetto BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_accordi_coop_partecipanti') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_acc_coop_part_1 UNIQUE (id_accordo_cooperazione,id_soggetto),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_accordi_coop_partecipanti_1 FOREIGN KEY (id_soggetto) REFERENCES soggetti(id),
 	CONSTRAINT fk_accordi_coop_partecipanti_2 FOREIGN KEY (id_accordo_cooperazione) REFERENCES accordi_cooperazione(id),
 	CONSTRAINT pk_accordi_coop_partecipanti PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_AC_COOP_PAR ON accordi_coop_partecipanti (id_accordo_cooperazione);
@@ -927,6 +929,8 @@ CREATE INDEX INDEX_AC_COOP_PAR ON accordi_coop_partecipanti (id_accordo_cooperaz
 
 
 -- **** Accordi di Servizio Parte Specifica ****
+
+CREATE SEQUENCE seq_servizi start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE servizi
 (
@@ -936,13 +940,12 @@ CREATE TABLE servizi
 	id_accordo BIGINT NOT NULL,
 	servizio_correlato VARCHAR(255),
 	id_connettore BIGINT NOT NULL,
-	wsdl_implementativo_erogatore MEDIUMTEXT,
-	wsdl_implementativo_fruitore MEDIUMTEXT,
+	wsdl_implementativo_erogatore TEXT,
+	wsdl_implementativo_fruitore TEXT,
 	superuser VARCHAR(255),
 	-- 1/0 (true/false) indica se il soggetto e' privato/pubblico
 	privato INT DEFAULT 0,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	port_type VARCHAR(255),
 	profilo VARCHAR(255),
 	descrizione VARCHAR(255),
@@ -951,7 +954,7 @@ CREATE TABLE servizi
 	aps_nome VARCHAR(255),
 	aps_versione VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_servizi') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_servizi_1 CHECK (stato IN ('finale','bozza','operativo')),
 	-- unique constraints
@@ -961,29 +964,29 @@ CREATE TABLE servizi
 	CONSTRAINT fk_servizi_2 FOREIGN KEY (id_soggetto) REFERENCES soggetti(id),
 	CONSTRAINT fk_servizi_3 FOREIGN KEY (id_accordo) REFERENCES accordi(id),
 	CONSTRAINT pk_servizi PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
-CREATE INDEX index_servizi_1 ON servizi (nome_servizio,tipo_servizio,id_soggetto);
 CREATE INDEX INDEX_APS ON servizi (aps_nome,aps_versione,id_soggetto);
 
 
+
+CREATE SEQUENCE seq_servizi_fruitori start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE servizi_fruitori
 (
 	id_servizio BIGINT NOT NULL,
 	id_soggetto BIGINT NOT NULL,
 	id_connettore BIGINT NOT NULL,
-	wsdl_implementativo_erogatore MEDIUMTEXT,
-	wsdl_implementativo_fruitore MEDIUMTEXT,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	wsdl_implementativo_erogatore TEXT,
+	wsdl_implementativo_fruitore TEXT,
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	profilo VARCHAR(255),
 	-- client auth: disabilitato/abilitato
 	client_auth VARCHAR(255),
 	stato VARCHAR(255) NOT NULL DEFAULT 'finale',
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_servizi_fruitori') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_servizi_fruitori_1 CHECK (stato IN ('finale','bozza','operativo')),
 	-- unique constraints
@@ -993,12 +996,12 @@ CREATE TABLE servizi_fruitori
 	CONSTRAINT fk_servizi_fruitori_2 FOREIGN KEY (id_soggetto) REFERENCES soggetti(id),
 	CONSTRAINT fk_servizi_fruitori_3 FOREIGN KEY (id_servizio) REFERENCES servizi(id),
 	CONSTRAINT pk_servizi_fruitori PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_servizi_fruitori_1 ON servizi_fruitori (id_servizio,id_soggetto);
+);
 
 
+
+
+CREATE SEQUENCE seq_servizi_azioni start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE servizi_azioni
 (
@@ -1006,41 +1009,42 @@ CREATE TABLE servizi_azioni
 	id_servizio BIGINT NOT NULL,
 	id_connettore BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_servizi_azioni') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_servizi_azioni_1 UNIQUE (nome_azione,id_servizio),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_servizi_azioni_1 FOREIGN KEY (id_connettore) REFERENCES connettori(id),
 	CONSTRAINT fk_servizi_azioni_2 FOREIGN KEY (id_servizio) REFERENCES servizi(id),
 	CONSTRAINT pk_servizi_azioni PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
--- index
-CREATE INDEX index_servizi_azioni_1 ON servizi_azioni (nome_azione,id_servizio);
 
 
 
 -- **** Accordi di Servizio Composti ****
+
+CREATE SEQUENCE seq_acc_serv_composti start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE acc_serv_composti
 (
 	id_accordo BIGINT NOT NULL,
 	id_accordo_cooperazione BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_acc_serv_composti') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_acc_serv_composti_1 UNIQUE (id_accordo),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_acc_serv_composti_1 FOREIGN KEY (id_accordo_cooperazione) REFERENCES accordi_cooperazione(id),
 	CONSTRAINT fk_acc_serv_composti_2 FOREIGN KEY (id_accordo) REFERENCES accordi(id),
 	CONSTRAINT pk_acc_serv_composti PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
-CREATE INDEX index_acc_serv_composti_1 ON acc_serv_composti (id_accordo);
 CREATE INDEX INDEX_AC_SC ON acc_serv_composti (id_accordo_cooperazione);
 
 
+
+CREATE SEQUENCE seq_acc_serv_componenti start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE acc_serv_componenti
 (
@@ -1048,12 +1052,12 @@ CREATE TABLE acc_serv_componenti
 	id_servizio_componente BIGINT NOT NULL,
 	azione VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_acc_serv_componenti') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_acc_serv_componenti_1 FOREIGN KEY (id_servizio_composto) REFERENCES acc_serv_composti(id),
 	CONSTRAINT fk_acc_serv_componenti_2 FOREIGN KEY (id_servizio_componente) REFERENCES servizi(id),
 	CONSTRAINT pk_acc_serv_componenti PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_AC_SC_SC ON acc_serv_componenti (id_servizio_composto);
@@ -1064,6 +1068,8 @@ CREATE INDEX INDEX_AC_SC_SC ON acc_serv_componenti (id_servizio_composto);
 -- openspcoop2
 		  		
 -- **** Servizi Applicativi ****
+
+CREATE SEQUENCE seq_servizi_applicativi start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE servizi_applicativi
 (
@@ -1112,20 +1118,17 @@ CREATE TABLE servizi_applicativi
 	sbustamento_protocol_info INT DEFAULT 1,
 	tipologia_fruizione VARCHAR(255),
 	tipologia_erogazione VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_servizi_applicativi') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_servizi_applicativi_1 UNIQUE (nome,id_soggetto),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_servizi_applicativi_1 FOREIGN KEY (id_connettore_inv) REFERENCES connettori(id),
 	CONSTRAINT fk_servizi_applicativi_2 FOREIGN KEY (id_soggetto) REFERENCES soggetti(id),
 	CONSTRAINT pk_servizi_applicativi PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
--- index
-CREATE INDEX index_servizi_applicativi_1 ON servizi_applicativi (nome,id_soggetto);
 
 
 
@@ -1134,20 +1137,22 @@ CREATE INDEX index_servizi_applicativi_1 ON servizi_applicativi (nome,id_soggett
 		  		
 -- **** Ruoli ****
 
+CREATE SEQUENCE seq_ruoli_sa start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE ruoli_sa
 (
 	id_accordo BIGINT NOT NULL,
 	servizio_correlato INT NOT NULL,
 	id_servizio_applicativo BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_ruoli_sa') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_ruoli_sa_1 UNIQUE (id_accordo,servizio_correlato,id_servizio_applicativo),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_ruoli_sa_1 FOREIGN KEY (id_servizio_applicativo) REFERENCES servizi_applicativi(id),
 	CONSTRAINT fk_ruoli_sa_2 FOREIGN KEY (id_accordo) REFERENCES accordi(id),
 	CONSTRAINT pk_ruoli_sa PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_RUOLI ON ruoli_sa (id_accordo,servizio_correlato);
@@ -1160,13 +1165,15 @@ CREATE INDEX INDEX_RUOLI_SA ON ruoli_sa (id_servizio_applicativo);
 		  		
 -- **** Politiche di Sicurezza ****
 
+CREATE SEQUENCE seq_politiche_sicurezza start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE politiche_sicurezza
 (
 	id_fruitore BIGINT NOT NULL,
 	id_servizio BIGINT NOT NULL,
 	id_servizio_applicativo BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_politiche_sicurezza') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_politiche_sicurezza_1 UNIQUE (id_fruitore,id_servizio,id_servizio_applicativo),
 	-- fk/pk keys constraints
@@ -1174,10 +1181,8 @@ CREATE TABLE politiche_sicurezza
 	CONSTRAINT fk_politiche_sicurezza_2 FOREIGN KEY (id_servizio_applicativo) REFERENCES servizi_applicativi(id),
 	CONSTRAINT fk_politiche_sicurezza_3 FOREIGN KEY (id_servizio) REFERENCES servizi(id),
 	CONSTRAINT pk_politiche_sicurezza PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
--- index
-CREATE INDEX index_politiche_sicurezza_1 ON politiche_sicurezza (id_fruitore,id_servizio,id_servizio_applicativo);
 
 
 
@@ -1185,6 +1190,8 @@ CREATE INDEX index_politiche_sicurezza_1 ON politiche_sicurezza (id_fruitore,id_
 -- openspcoop2
 		  		
 -- **** Porte Delegate ****
+
+CREATE SEQUENCE seq_porte_delegate start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE porte_delegate
 (
@@ -1262,40 +1269,41 @@ CREATE TABLE porte_delegate
 	local_forward VARCHAR(255),
 	-- proprietario porta delegata (Soggetto fruitore)
 	id_soggetto BIGINT NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_porte_delegate') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_porte_delegate_1 UNIQUE (id_soggetto,nome_porta),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_porte_delegate_1 FOREIGN KEY (id_soggetto) REFERENCES soggetti(id),
 	CONSTRAINT pk_porte_delegate PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_porte_delegate_1 ON porte_delegate (id_soggetto,nome_porta);
+);
 
 
+
+
+CREATE SEQUENCE seq_porte_delegate_sa start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE porte_delegate_sa
 (
 	id_porta BIGINT NOT NULL,
 	id_servizio_applicativo BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_porte_delegate_sa') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_porte_delegate_sa_1 UNIQUE (id_porta,id_servizio_applicativo),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_porte_delegate_sa_1 FOREIGN KEY (id_servizio_applicativo) REFERENCES servizi_applicativi(id),
 	CONSTRAINT fk_porte_delegate_sa_2 FOREIGN KEY (id_porta) REFERENCES porte_delegate(id),
 	CONSTRAINT pk_porte_delegate_sa PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PD_SA ON porte_delegate_sa (id_porta);
 
 
+
+CREATE SEQUENCE seq_pd_mtom_request start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pd_mtom_request
 (
@@ -1305,16 +1313,18 @@ CREATE TABLE pd_mtom_request
 	content_type VARCHAR(255),
 	required INT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pd_mtom_request') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pd_mtom_request_1 FOREIGN KEY (id_porta) REFERENCES porte_delegate(id),
 	CONSTRAINT pk_pd_mtom_request PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PD_MTOMTREQ ON pd_mtom_request (id_porta);
 
 
+
+CREATE SEQUENCE seq_pd_mtom_response start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pd_mtom_response
 (
@@ -1324,16 +1334,18 @@ CREATE TABLE pd_mtom_response
 	content_type VARCHAR(255),
 	required INT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pd_mtom_response') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pd_mtom_response_1 FOREIGN KEY (id_porta) REFERENCES porte_delegate(id),
 	CONSTRAINT pk_pd_mtom_response PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PD_MTOMTRES ON pd_mtom_response (id_porta);
 
 
+
+CREATE SEQUENCE seq_pd_ws_request start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pd_ws_request
 (
@@ -1341,16 +1353,18 @@ CREATE TABLE pd_ws_request
 	nome VARCHAR(255) NOT NULL,
 	valore TEXT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pd_ws_request') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pd_ws_request_1 FOREIGN KEY (id_porta) REFERENCES porte_delegate(id),
 	CONSTRAINT pk_pd_ws_request PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PD_WSSREQ ON pd_ws_request (id_porta);
 
 
+
+CREATE SEQUENCE seq_pd_ws_response start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pd_ws_response
 (
@@ -1358,16 +1372,18 @@ CREATE TABLE pd_ws_response
 	nome VARCHAR(255) NOT NULL,
 	valore TEXT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pd_ws_response') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pd_ws_response_1 FOREIGN KEY (id_porta) REFERENCES porte_delegate(id),
 	CONSTRAINT pk_pd_ws_response PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PD_WSSRES ON pd_ws_response (id_porta);
 
 
+
+CREATE SEQUENCE seq_pd_correlazione start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pd_correlazione
 (
@@ -1382,14 +1398,16 @@ CREATE TABLE pd_correlazione
 	-- abilitato/disabilitato
 	riuso_id VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pd_correlazione') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pd_correlazione_1 FOREIGN KEY (id_porta) REFERENCES porte_delegate(id),
 	CONSTRAINT pk_pd_correlazione PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_pd_correlazione_risposta start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pd_correlazione_risposta
 (
@@ -1402,11 +1420,11 @@ CREATE TABLE pd_correlazione_risposta
 	-- blocca/accetta
 	identificazione_fallita VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pd_correlazione_risposta') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pd_correlazione_risposta_1 FOREIGN KEY (id_porta) REFERENCES porte_delegate(id),
 	CONSTRAINT pk_pd_correlazione_risposta PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
@@ -1415,6 +1433,8 @@ CREATE TABLE pd_correlazione_risposta
 -- openspcoop2
 		  		
 -- **** Porte Applicative ****
+
+CREATE SEQUENCE seq_porte_applicative start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE porte_applicative
 (
@@ -1468,40 +1488,41 @@ CREATE TABLE porte_applicative
 	autorizzazione_contenuto VARCHAR(255),
 	-- proprietario porta applicativa
 	id_soggetto BIGINT NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_porte_applicative') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_porte_applicative_1 UNIQUE (id_soggetto,nome_porta),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_porte_applicative_1 FOREIGN KEY (id_soggetto) REFERENCES soggetti(id),
 	CONSTRAINT pk_porte_applicative PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_porte_applicative_1 ON porte_applicative (id_soggetto,nome_porta);
+);
 
 
+
+
+CREATE SEQUENCE seq_porte_applicative_sa start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE porte_applicative_sa
 (
 	id_porta BIGINT NOT NULL,
 	id_servizio_applicativo BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_porte_applicative_sa') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_porte_applicative_sa_1 UNIQUE (id_porta,id_servizio_applicativo),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_porte_applicative_sa_1 FOREIGN KEY (id_servizio_applicativo) REFERENCES servizi_applicativi(id),
 	CONSTRAINT fk_porte_applicative_sa_2 FOREIGN KEY (id_porta) REFERENCES porte_applicative(id),
 	CONSTRAINT pk_porte_applicative_sa PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PA_SA ON porte_applicative_sa (id_porta);
 
 
+
+CREATE SEQUENCE seq_pa_properties start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pa_properties
 (
@@ -1509,18 +1530,20 @@ CREATE TABLE pa_properties
 	nome VARCHAR(255) NOT NULL,
 	valore VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pa_properties') NOT NULL,
 	-- unique constraints
 	CONSTRAINT uniq_pa_properties_1 UNIQUE (id_porta,nome,valore),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pa_properties_1 FOREIGN KEY (id_porta) REFERENCES porte_applicative(id),
 	CONSTRAINT pk_pa_properties PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PA_PROP ON pa_properties (id_porta);
 
 
+
+CREATE SEQUENCE seq_pa_mtom_request start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pa_mtom_request
 (
@@ -1530,16 +1553,18 @@ CREATE TABLE pa_mtom_request
 	content_type VARCHAR(255),
 	required INT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pa_mtom_request') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pa_mtom_request_1 FOREIGN KEY (id_porta) REFERENCES porte_applicative(id),
 	CONSTRAINT pk_pa_mtom_request PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PA_MTOMTREQ ON pa_mtom_request (id_porta);
 
 
+
+CREATE SEQUENCE seq_pa_mtom_response start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pa_mtom_response
 (
@@ -1549,16 +1574,18 @@ CREATE TABLE pa_mtom_response
 	content_type VARCHAR(255),
 	required INT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pa_mtom_response') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pa_mtom_response_1 FOREIGN KEY (id_porta) REFERENCES porte_applicative(id),
 	CONSTRAINT pk_pa_mtom_response PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PA_MTOMTRES ON pa_mtom_response (id_porta);
 
 
+
+CREATE SEQUENCE seq_pa_ws_request start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pa_ws_request
 (
@@ -1566,16 +1593,18 @@ CREATE TABLE pa_ws_request
 	nome VARCHAR(255) NOT NULL,
 	valore TEXT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pa_ws_request') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pa_ws_request_1 FOREIGN KEY (id_porta) REFERENCES porte_applicative(id),
 	CONSTRAINT pk_pa_ws_request PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PA_WSSREQ ON pa_ws_request (id_porta);
 
 
+
+CREATE SEQUENCE seq_pa_ws_response start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pa_ws_response
 (
@@ -1583,16 +1612,18 @@ CREATE TABLE pa_ws_response
 	nome VARCHAR(255) NOT NULL,
 	valore TEXT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pa_ws_response') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pa_ws_response_1 FOREIGN KEY (id_porta) REFERENCES porte_applicative(id),
 	CONSTRAINT pk_pa_ws_response PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX INDEX_PA_WSSRES ON pa_ws_response (id_porta);
 
 
+
+CREATE SEQUENCE seq_pa_correlazione start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pa_correlazione
 (
@@ -1605,14 +1636,16 @@ CREATE TABLE pa_correlazione
 	-- blocca/accetta
 	identificazione_fallita VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pa_correlazione') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pa_correlazione_1 FOREIGN KEY (id_porta) REFERENCES porte_applicative(id),
 	CONSTRAINT pk_pa_correlazione PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_pa_correlazione_risposta start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE pa_correlazione_risposta
 (
@@ -1625,11 +1658,11 @@ CREATE TABLE pa_correlazione_risposta
 	-- blocca/accetta
 	identificazione_fallita VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pa_correlazione_risposta') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_pa_correlazione_risposta_1 FOREIGN KEY (id_porta) REFERENCES porte_applicative(id),
 	CONSTRAINT pk_pa_correlazione_risposta PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
@@ -1638,6 +1671,8 @@ CREATE TABLE pa_correlazione_risposta
 -- openspcoop2
 		  		
 -- **** Audit Appenders ****
+
+CREATE SEQUENCE seq_audit_operations start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE audit_operations
 (
@@ -1650,24 +1685,22 @@ CREATE TABLE audit_operations
 	utente VARCHAR(255) NOT NULL,
 	stato VARCHAR(255) NOT NULL,
 	-- Dettaglio oggetto in gestione (Rappresentazione tramite JSON o XML format)
-	object_details MEDIUMTEXT,
+	object_details TEXT,
 	-- Class, serve eventualmente per riottenere l'oggetto dal dettaglio
 	-- non definito in caso di LOGIN/LOGOUT
 	object_class VARCHAR(255),
 	-- Eventuale messaggio di errore
 	error TEXT,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	time_request TIMESTAMP(3) NOT NULL DEFAULT 0,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	time_execute TIMESTAMP(3) NOT NULL DEFAULT 0,
+	time_request TIMESTAMP NOT NULL,
+	time_execute TIMESTAMP NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_audit_operations') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_audit_operations_1 CHECK (tipo_operazione IN ('LOGIN','LOGOUT','ADD','CHANGE','DEL')),
 	CONSTRAINT chk_audit_operations_2 CHECK (stato IN ('requesting','error','completed')),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_audit_operations PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX audit_filter_time ON audit_operations (time_request);
@@ -1675,24 +1708,23 @@ CREATE INDEX audit_filter ON audit_operations (tipo_operazione,tipo,utente,stato
 
 
 
+CREATE SEQUENCE seq_audit_binaries start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
+
 CREATE TABLE audit_binaries
 (
 	binary_id VARCHAR(255) NOT NULL,
 	checksum BIGINT NOT NULL,
 	id_audit_operation BIGINT NOT NULL,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	time_rec TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	time_rec TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_audit_binaries') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_audit_binaries_1 UNIQUE (binary_id,id_audit_operation),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_audit_binaries_1 FOREIGN KEY (id_audit_operation) REFERENCES audit_operations(id),
 	CONSTRAINT pk_audit_binaries PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
--- index
-CREATE INDEX index_audit_binaries_1 ON audit_binaries (binary_id,id_audit_operation);
 
 
 
@@ -1701,6 +1733,8 @@ CREATE INDEX index_audit_binaries_1 ON audit_binaries (binary_id,id_audit_operat
 		  		
 -- **** Audit Configuration ****
 
+CREATE SEQUENCE seq_audit_conf start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE audit_conf
 (
 	audit_engine INT NOT NULL DEFAULT 0,
@@ -1708,13 +1742,15 @@ CREATE TABLE audit_conf
 	dump INT NOT NULL DEFAULT 0,
 	dump_format VARCHAR(255) NOT NULL DEFAULT 'JSON',
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_audit_conf') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_audit_conf PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_audit_filters start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE audit_filters
 (
@@ -1731,34 +1767,37 @@ CREATE TABLE audit_filters
 	enabled INT NOT NULL DEFAULT 0,
 	dump INT NOT NULL DEFAULT 0,
 	-- Tempo di registrazione
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+	ora_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_audit_filters') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_audit_filters_1 CHECK (tipo_operazione IN ('ADD','CHANGE','DEL')),
 	CONSTRAINT chk_audit_filters_2 CHECK (stato IN ('requesting','error','completed')),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_audit_filters PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_audit_appender start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE audit_appender
 (
 	name VARCHAR(255) NOT NULL,
 	class VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_audit_appender') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_audit_appender_1 UNIQUE (name),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_audit_appender PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_audit_appender_prop start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE audit_appender_prop
 (
@@ -1766,11 +1805,11 @@ CREATE TABLE audit_appender_prop
 	value VARCHAR(255) NOT NULL,
 	id_audit_appender BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_audit_appender_prop') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_audit_appender_prop_1 FOREIGN KEY (id_audit_appender) REFERENCES audit_appender(id),
 	CONSTRAINT pk_audit_appender_prop PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
@@ -1780,6 +1819,8 @@ CREATE TABLE audit_appender_prop
 		  		
 -- **** Operations ****
 
+CREATE SEQUENCE seq_operations start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
+
 CREATE TABLE operations
 (
 	operation VARCHAR(255) NOT NULL,
@@ -1788,16 +1829,14 @@ CREATE TABLE operations
 	hostname VARCHAR(255) NOT NULL,
 	status VARCHAR(255) NOT NULL,
 	details TEXT,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	timereq TIMESTAMP(3) NOT NULL DEFAULT 0,
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	timexecute TIMESTAMP(3) NOT NULL DEFAULT 0,
+	timereq TIMESTAMP NOT NULL,
+	timexecute TIMESTAMP NOT NULL,
 	deleted INT NOT NULL DEFAULT 0,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_operations') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_operations PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX operations_superuser ON operations (superuser);
@@ -1805,17 +1844,19 @@ CREATE INDEX operations_precedenti ON operations (id,deleted,hostname,timereq);
 
 
 
+CREATE SEQUENCE seq_parameters start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
+
 CREATE TABLE parameters
 (
 	id_operations BIGINT NOT NULL,
 	name VARCHAR(255) NOT NULL,
 	value VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_parameters') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_parameters_1 FOREIGN KEY (id_operations) REFERENCES operations(id),
 	CONSTRAINT pk_parameters PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX parameters_index ON parameters (name,value);
@@ -1827,6 +1868,8 @@ CREATE INDEX parameters_index ON parameters (name,value);
 		  		
 -- **** Utenti ****
 
+CREATE SEQUENCE seq_users start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE users
 (
 	login VARCHAR(255) NOT NULL,
@@ -1834,12 +1877,12 @@ CREATE TABLE users
 	tipo_interfaccia VARCHAR(255) NOT NULL,
 	permessi VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_users') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_users_1 UNIQUE (login),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_users PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
@@ -1847,16 +1890,18 @@ CREATE TABLE users
 
 -- openspcoop2
 		  		
+CREATE SEQUENCE seq_db_info_console start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE db_info_console
 (
 	major_version INT NOT NULL,
 	minor_version INT NOT NULL,
 	notes VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_db_info_console') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_db_info_console PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
@@ -1867,7 +1912,7 @@ CREATE TABLE db_info_console
 
 INSERT INTO audit_appender (name,class) VALUES ('dbAppender','org.openspcoop2.web.lib.audit.appender.AuditDBAppender');
 INSERT INTO audit_appender_prop (name,value,id_audit_appender) VALUES ('datasource','org.openspcoop2.dataSource.pddConsole',(select id from audit_appender where name='dbAppender'));
-INSERT INTO audit_appender_prop (name,value,id_audit_appender) VALUES ('tipoDatabase','mysql',(select id from audit_appender where name='dbAppender'));
+INSERT INTO audit_appender_prop (name,value,id_audit_appender) VALUES ('tipoDatabase','postgresql',(select id from audit_appender where name='dbAppender'));
 
 
 -- openspcoop2
@@ -1902,6 +1947,8 @@ INSERT INTO db_info_console (major_version,minor_version,notes) VALUES (2,3,'[Op
 
 -- **** Configurazione ****
 
+CREATE SEQUENCE seq_registri start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE registri
 (
 	nome VARCHAR(255) NOT NULL,
@@ -1910,15 +1957,17 @@ CREATE TABLE registri
 	utente VARCHAR(255),
 	password VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_registri') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_registri_1 UNIQUE (nome),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_registri PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_routing start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE routing
 (
@@ -1932,13 +1981,15 @@ CREATE TABLE routing
 	registrorotta BIGINT,
 	is_default BIGINT NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_routing') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_routing PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_configurazione start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE configurazione
 (
@@ -2000,27 +2051,31 @@ CREATE TABLE configurazione
 	-- FOREIGN KEY (id_ge_integrazione) REFERENCES gestione_errore(id) Nota: indica un eventuale tipologia di gestione dell'errore di default durante l'utilizzo di un connettore
 	id_ge_integrazione BIGINT,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_configurazione') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_configurazione PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
 
 -- **** Messaggi diagnostici Appender ****
 
+CREATE SEQUENCE seq_msgdiag_appender start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE msgdiag_appender
 (
 	tipo VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_msgdiag_appender') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_msgdiag_appender PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_msgdiag_appender_prop start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE msgdiag_appender_prop
 (
@@ -2028,30 +2083,34 @@ CREATE TABLE msgdiag_appender_prop
 	nome VARCHAR(255) NOT NULL,
 	valore VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_msgdiag_appender_prop') NOT NULL,
 	-- unique constraints
 	CONSTRAINT uniq_msgdiag_app_prop_1 UNIQUE (id_appender,nome,valore),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_msgdiag_appender_prop_1 FOREIGN KEY (id_appender) REFERENCES msgdiag_appender(id),
 	CONSTRAINT pk_msgdiag_appender_prop PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
 
 -- **** Tracciamento Appender ****
 
+CREATE SEQUENCE seq_tracce_appender start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE tracce_appender
 (
 	tipo VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce_appender') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_tracce_appender PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_tracce_appender_prop start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE tracce_appender_prop
 (
@@ -2059,18 +2118,20 @@ CREATE TABLE tracce_appender_prop
 	nome VARCHAR(255) NOT NULL,
 	valore VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce_appender_prop') NOT NULL,
 	-- unique constraints
 	CONSTRAINT uniq_tracce_app_prop_1 UNIQUE (id_appender,nome,valore),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_tracce_appender_prop_1 FOREIGN KEY (id_appender) REFERENCES tracce_appender(id),
 	CONSTRAINT pk_tracce_appender_prop PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
 
 -- **** Datasources dove reperire i messaggi diagnostici salvati ****
+
+CREATE SEQUENCE seq_msgdiag_ds start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE msgdiag_ds
 (
@@ -2078,15 +2139,17 @@ CREATE TABLE msgdiag_ds
 	nome_jndi VARCHAR(255) NOT NULL,
 	tipo_database VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_msgdiag_ds') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_msgdiag_ds_1 UNIQUE (nome),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_msgdiag_ds PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_msgdiag_ds_prop start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE msgdiag_ds_prop
 (
@@ -2094,18 +2157,20 @@ CREATE TABLE msgdiag_ds_prop
 	nome VARCHAR(255) NOT NULL,
 	valore VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_msgdiag_ds_prop') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_msgdiag_ds_prop_1 UNIQUE (id_prop,nome,valore),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_msgdiag_ds_prop_1 FOREIGN KEY (id_prop) REFERENCES msgdiag_ds(id),
 	CONSTRAINT pk_msgdiag_ds_prop PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
 
 -- **** Datasources dove reperire le tracce salvate ****
+
+CREATE SEQUENCE seq_tracce_ds start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE tracce_ds
 (
@@ -2113,15 +2178,17 @@ CREATE TABLE tracce_ds
 	nome_jndi VARCHAR(255) NOT NULL,
 	tipo_database VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce_ds') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_tracce_ds_1 UNIQUE (nome),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_tracce_ds PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
+
+CREATE SEQUENCE seq_tracce_ds_prop start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE tracce_ds_prop
 (
@@ -2129,18 +2196,20 @@ CREATE TABLE tracce_ds_prop
 	nome VARCHAR(255) NOT NULL,
 	valore VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce_ds_prop') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_tracce_ds_prop_1 UNIQUE (id_prop,nome,valore),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_tracce_ds_prop_1 FOREIGN KEY (id_prop) REFERENCES tracce_ds(id),
 	CONSTRAINT pk_tracce_ds_prop PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
 
 -- **** Stato dei servizi attivi sulla Porta di Dominio ****
+
+CREATE SEQUENCE seq_servizi_pdd start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE servizi_pdd
 (
@@ -2148,17 +2217,17 @@ CREATE TABLE servizi_pdd
 	-- Stato dei servizi attivi sulla Porta di Dominio
 	stato INT DEFAULT 1,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_servizi_pdd') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_servizi_pdd_1 UNIQUE (componente),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_servizi_pdd PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
-
--- index
-CREATE INDEX index_servizi_pdd_1 ON servizi_pdd (componente);
+);
 
 
+
+
+CREATE SEQUENCE seq_servizi_pdd_filtri start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
 
 CREATE TABLE servizi_pdd_filtri
 (
@@ -2174,43 +2243,44 @@ CREATE TABLE servizi_pdd_filtri
 	servizio VARCHAR(255),
 	azione VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_servizi_pdd_filtri') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_servizi_pdd_filtri_1 CHECK (tipo_filtro IN ('abilitazione','disabilitazione')),
 	-- fk/pk keys constraints
 	CONSTRAINT fk_servizi_pdd_filtri_1 FOREIGN KEY (id_servizio_pdd) REFERENCES servizi_pdd(id),
 	CONSTRAINT pk_servizi_pdd_filtri PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
 
 -- **** PddSystemProperties ****
 
+CREATE SEQUENCE seq_pdd_sys_props start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 NO CYCLE;
+
 CREATE TABLE pdd_sys_props
 (
 	nome VARCHAR(255) NOT NULL,
 	valore VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_pdd_sys_props') NOT NULL,
 	-- unique constraints
 	CONSTRAINT unique_pdd_sys_props_1 UNIQUE (nome,valore),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_pdd_sys_props PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
--- index
-CREATE INDEX index_pdd_sys_props_1 ON pdd_sys_props (nome,valore);
 
 
 
 
 -- openspcoop2
 		  		
+CREATE SEQUENCE seq_tracce start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
+
 CREATE TABLE tracce
 (
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	gdo TIMESTAMP(3) NOT NULL DEFAULT 0,
+	gdo TIMESTAMP NOT NULL,
 	gdo_int BIGINT NOT NULL,
 	pdd_codice VARCHAR(255) NOT NULL,
 	pdd_tipo_soggetto VARCHAR(255) NOT NULL,
@@ -2237,13 +2307,11 @@ CREATE TABLE tracce
 	tipo_servizio VARCHAR(255),
 	azione VARCHAR(255),
 	id_messaggio VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT 0,
+	ora_registrazione TIMESTAMP,
 	tipo_ora_reg VARCHAR(255),
 	tipo_ora_reg_meta VARCHAR(255),
 	rif_messaggio VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	scadenza TIMESTAMP(3) DEFAULT 0,
+	scadenza TIMESTAMP,
 	inoltro VARCHAR(255),
 	inoltro_meta VARCHAR(255),
 	conferma_ricezione INT,
@@ -2261,14 +2329,14 @@ CREATE TABLE tracce
 	soap_element TEXT,
 	digest TEXT,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_tracce_1 CHECK (pdd_ruolo IN ('delegata','applicativa','integrationManager','router')),
 	CONSTRAINT chk_tracce_2 CHECK (tipo_messaggio IN ('Richiesta','Risposta')),
 	CONSTRAINT chk_tracce_3 CHECK (esito_elaborazione IN ('INVIATO','RICEVUTO','ERRORE')),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_tracce PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX TRACCE_SEARCH_ID ON tracce (id_messaggio,pdd_codice);
@@ -2278,25 +2346,28 @@ CREATE INDEX TRACCE_SEARCH_RIF_SOGGETTO ON tracce (rif_messaggio,pdd_tipo_sogget
 
 
 
+CREATE SEQUENCE seq_tracce_riscontri start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
+
 CREATE TABLE tracce_riscontri
 (
 	idtraccia BIGINT NOT NULL,
 	riscontro VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT 0,
+	ora_registrazione TIMESTAMP,
 	tipo_ora_reg VARCHAR(255),
 	tipo_ora_reg_meta VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce_riscontri') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_tracce_riscontri_1 FOREIGN KEY (idtraccia) REFERENCES tracce(id) ON DELETE CASCADE,
 	CONSTRAINT pk_tracce_riscontri PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX TRACCE_RIS ON tracce_riscontri (idtraccia);
 
 
+
+CREATE SEQUENCE seq_tracce_trasmissioni start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE tracce_trasmissioni
 (
@@ -2309,21 +2380,22 @@ CREATE TABLE tracce_trasmissioni
 	tipo_destinazione VARCHAR(255),
 	indirizzo_destinazione VARCHAR(255),
 	idporta_destinazione VARCHAR(255),
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	ora_registrazione TIMESTAMP(3) DEFAULT 0,
+	ora_registrazione TIMESTAMP,
 	tipo_ora_reg VARCHAR(255),
 	tipo_ora_reg_meta VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce_trasmissioni') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_tracce_trasmissioni_1 FOREIGN KEY (idtraccia) REFERENCES tracce(id) ON DELETE CASCADE,
 	CONSTRAINT pk_tracce_trasmissioni PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX TRACCE_TR ON tracce_trasmissioni (idtraccia);
 
 
+
+CREATE SEQUENCE seq_tracce_eccezioni start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE tracce_eccezioni
 (
@@ -2337,16 +2409,18 @@ CREATE TABLE tracce_eccezioni
 	rilevanza_meta VARCHAR(255),
 	posizione TEXT,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce_eccezioni') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_tracce_eccezioni_1 FOREIGN KEY (idtraccia) REFERENCES tracce(id) ON DELETE CASCADE,
 	CONSTRAINT pk_tracce_eccezioni PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX TRACCE_ECC ON tracce_eccezioni (idtraccia);
 
 
+
+CREATE SEQUENCE seq_tracce_allegati start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE tracce_allegati
 (
@@ -2356,16 +2430,18 @@ CREATE TABLE tracce_allegati
 	content_type VARCHAR(255),
 	digest TEXT,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce_allegati') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_tracce_allegati_1 FOREIGN KEY (idtraccia) REFERENCES tracce(id) ON DELETE CASCADE,
 	CONSTRAINT pk_tracce_allegati PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX TRACCE_ALLEGATI_INDEX ON tracce_allegati (idtraccia);
 
 
+
+CREATE SEQUENCE seq_tracce_ext_protocol_info start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE tracce_ext_protocol_info
 (
@@ -2373,11 +2449,11 @@ CREATE TABLE tracce_ext_protocol_info
 	name VARCHAR(255) NOT NULL,
 	value TEXT,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_tracce_ext_protocol_info') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT fk_tracce_ext_protocol_info_1 FOREIGN KEY (idtraccia) REFERENCES tracce(id) ON DELETE CASCADE,
 	CONSTRAINT pk_tracce_ext_protocol_info PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX TRACCE_EXT_INFO ON tracce_ext_protocol_info (idtraccia);
@@ -2387,10 +2463,11 @@ CREATE INDEX TRACCE_EXT_INFO ON tracce_ext_protocol_info (idtraccia);
 
 -- openspcoop2
 		  		
+CREATE SEQUENCE seq_msgdiagnostici start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
+
 CREATE TABLE msgdiagnostici
 (
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	gdo TIMESTAMP(3) NOT NULL DEFAULT 0,
+	gdo TIMESTAMP NOT NULL,
 	pdd_codice VARCHAR(255) NOT NULL,
 	pdd_tipo_soggetto VARCHAR(255) NOT NULL,
 	pdd_nome_soggetto VARCHAR(255) NOT NULL,
@@ -2406,18 +2483,20 @@ CREATE TABLE msgdiagnostici
 	-- Protocollo (puo' non essere presente per i diagnostici di 'servizio' della porta)
 	protocollo VARCHAR(255),
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_msgdiagnostici') NOT NULL,
 	-- check constraints
 	CONSTRAINT chk_msgdiagnostici_1 CHECK (severita IN (0,1,2,3,4,5,6,7)),
 	-- fk/pk keys constraints
 	CONSTRAINT pk_msgdiagnostici PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX MSG_DIAG_ID ON msgdiagnostici (idmessaggio);
 CREATE INDEX MSG_DIAG_GDO ON msgdiagnostici (gdo);
 
 
+
+CREATE SEQUENCE seq_msgdiag_correlazione start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1 CYCLE;
 
 CREATE TABLE msgdiag_correlazione
 (
@@ -2427,8 +2506,7 @@ CREATE TABLE msgdiag_correlazione
 	pdd_tipo_soggetto VARCHAR(255) NOT NULL,
 	pdd_nome_soggetto VARCHAR(255) NOT NULL,
 	-- Data di registrazione
-	-- Precisione ai millisecondi supportata dalla versione 5.6.4, se si utilizza una versione precedente non usare il suffisso '(3)'
-	gdo TIMESTAMP(3) NOT NULL DEFAULT 0,
+	gdo TIMESTAMP NOT NULL,
 	-- nome porta delegata/applicativa
 	porta VARCHAR(255),
 	-- (1/0 true/false) True se siamo in un contesto di porta delegata, False se in un contesto di porta applicativa
@@ -2447,10 +2525,10 @@ CREATE TABLE msgdiag_correlazione
 	-- Protocollo
 	protocollo VARCHAR(255) NOT NULL,
 	-- fk/pk columns
-	id BIGINT AUTO_INCREMENT,
+	id BIGINT DEFAULT nextval('seq_msgdiag_correlazione') NOT NULL,
 	-- fk/pk keys constraints
 	CONSTRAINT pk_msgdiag_correlazione PRIMARY KEY (id)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 -- index
 CREATE INDEX MSG_CORR_INDEX ON msgdiag_correlazione (idmessaggio,delegata);
@@ -2468,7 +2546,7 @@ CREATE TABLE msgdiag_correlazione_sa
 	-- fk/pk keys constraints
 	CONSTRAINT fk_msgdiag_correlazione_sa_1 FOREIGN KEY (id_correlazione) REFERENCES msgdiag_correlazione(id) ON DELETE CASCADE,
 	CONSTRAINT pk_msgdiag_correlazione_sa PRIMARY KEY (id_correlazione,servizio_applicativo)
-)ENGINE INNODB CHARACTER SET latin1 COLLATE latin1_general_cs;
+);
 
 
 
@@ -2502,7 +2580,7 @@ INSERT INTO pdd (nome,tipo,superuser) VALUES ('PddOpenSPCoop','operativo','ammin
 -- Tracciamento
 INSERT INTO tracce_appender (tipo) VALUES ('protocol');
 INSERT INTO tracce_appender_prop (id_appender,nome,valore) VALUES ((select id from tracce_appender where tipo='protocol'),'datasource','org.openspcoop2.dataSource');
-INSERT INTO tracce_appender_prop (id_appender,nome,valore) VALUES ((select id from tracce_appender where tipo='protocol'),'tipoDatabase','mysql');
+INSERT INTO tracce_appender_prop (id_appender,nome,valore) VALUES ((select id from tracce_appender where tipo='protocol'),'tipoDatabase','postgresql');
 INSERT INTO tracce_appender_prop (id_appender,nome,valore) VALUES ((select id from tracce_appender where tipo='protocol'),'usePdDConnection','true'); 
 
 -- MsgDiagnostici
@@ -2557,4 +2635,4 @@ INSERT INTO soggetti (nome_soggetto,tipo_soggetto,descrizione,identificativo_por
 
 -- Utenza pddConsole
 
-INSERT INTO users (login, password, tipo_interfaccia, permessi) VALUES ('amministratore','$1$hl$2kMwAzMFgG5g5HPATSqku/','STANDARD','SDCMAU');
+INSERT INTO users (login, password, tipo_interfaccia, permessi) VALUES ('amministratore','$1$xM$w6jXANHJ.HLQWDN1z5r9e/','STANDARD','SDCMAU');

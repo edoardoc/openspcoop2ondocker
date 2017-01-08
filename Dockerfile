@@ -1,14 +1,18 @@
-# Use latest jboss/base-jdk:8 image as the base
+
 FROM jboss/wildfly
+#:8.1.0.Final
 ADD dist/archivi/OpenSPCoop2.ear /opt/jboss/wildfly/standalone/deployments/
 ADD dist/datasource/openspcoop2-ds.xml /opt/jboss/wildfly/standalone/deployments/
 ADD dist/datasource/openspcoop2_console-ds.xml /opt/jboss/wildfly/standalone/deployments/
-ADD mysql-connector-java-5.1.40-bin.jar /opt/jboss/wildfly/standalone/deployments/
+ADD drivers/postgresql-9.4.1212.jre7.jar /opt/jboss/wildfly/standalone/deployments/
 
 # make sure openspcoop2 gets its own writable log folder
 USER root
 RUN mkdir -p /var/openspcoop2/log/
 RUN chown -R jboss:jboss /var/openspcoop2
+
+RUN yum install telnet -y
+RUN yum install postgresql -y
 
 # timezone set for the image
 ENV TZ=Europe/Rome

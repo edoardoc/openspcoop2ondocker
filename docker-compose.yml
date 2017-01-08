@@ -1,27 +1,22 @@
 version: '2'
 services:
 
-  dbospc2host:
-    image: mysql:5.6
-    volumes:
-        # this is to execute the create db on start
-        - ./dist/sql:/docker-entrypoint-initdb.d
-    #   eventually mount db folders on the host
-    #    - ./data/mysql:/var/lib/mysql
-    #    - ./docker/mysql.d:/etc/mysql/conf.d
-    ports:
-        - 3306
-    environment:
-        MYSQL_DATABASE: openspcoop2
-        MYSQL_USER: openspcoop2
-        MYSQL_ROOT_PASSWORD: openspcoop2
-
   openspcoop2:
+    container_name: service
     build: .
-    #environment:
-    #    VIRTUAL_HOST: data.portaportese.it
-    #    VIRTUAL_PORT: 8080
     ports:
         - 8080
     depends_on:
-        - dbospc2host
+        - mydatabase
+    #command: ["/bin/bash", "-c", "sleep 30s"]
+
+  mydatabase:
+    container_name: database
+    image: postgres:9.4
+    volumes:
+        # this is to execute the DDL on start
+        - ./dist/sql:/docker-entrypoint-initdb.d
+    environment:
+        POSTGRES_DB: openspcoop2
+        POSTGRES_USER: openspcoop2
+        POSTGRES_PASSWORD: openspcoop2

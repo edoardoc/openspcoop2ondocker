@@ -4,11 +4,11 @@
 	<datasource jta="false" use-ccm="false" jndi-name="org.openspcoop2.dataSource.pddConsole" use-java-context="false" pool-name="org.openspcoop2.dataSource.pddConsole">
 
 		<!-- Connection URL -->
-		<connection-url>jdbc:mysql://openspcoop2dbhost:3306/openspcoop2?zeroDateTimeBehavior=convertToNull</connection-url>
+		<connection-url>jdbc:postgresql://mydatabase:5432/openspcoop2</connection-url>
 
 		<!-- DriverJDBC -->
-		<driver>mysql-connector-java-5.1.40-bin.jar</driver>
-		<driver-class>com.mysql.jdbc.Driver</driver-class>
+		<driver>postgresql-9.4.1212.jre7.jar</driver>
+		<driver-class>org.postgresql.Driver</driver-class>
 
 		<!-- Credenziali -->
 		<security>
@@ -33,8 +33,8 @@
 		-->
 		<new-connection-sql>SELECT 1</new-connection-sql>
 		<validation>
-			<!-- <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/> -->
-			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
+			<!-- <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"/> -->
+			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"/>
 			<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
 			<validate-on-match>true</validate-on-match>
 		</validation>
