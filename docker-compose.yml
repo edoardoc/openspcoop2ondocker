@@ -3,7 +3,7 @@ services:
 
   openspcoop2:
     container_name: service
-    build: .
+    build: openspcoop2img
     ports:
         - 8080:8080
         - 9990:9990
@@ -15,7 +15,7 @@ services:
     image: postgres:9.4
     volumes:
         # this is to execute the DDL on start
-        - ./dist/sql:/docker-entrypoint-initdb.d
+        - ./openspcoop2img/dist/sql:/docker-entrypoint-initdb.d
     environment:
         POSTGRES_DB: openspcoop2
         POSTGRES_USER: openspcoop2
