@@ -21,7 +21,7 @@ There is a small script that starts everything recreating the images and pulling
 
 > Doing this will start the Wildfly server, trying to deploy OpenSPCoop2.
 > At the same time a postgres db will start which will deploy openspcoop2 standard database on start.
-> during the first startup the main service will wait for postgres to finish using a bash script.
+> during the first startup the main service will wait for postgres to finish population the db.
 
 If everything goes well http://127.0.0.1:8080/pddConsole/ will show the admin console
 
