@@ -1,3 +1,4 @@
+# ARCHIVED
 # Wildfly OpenSPCoop2 application running with PostgreSQL on Docker
 This is a Docker compose framework to run a basic installation of OpenSPCoop2.
 OpenSPCoop2 is an open source e-government solution available at http://www.openspcoop.org/
